@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_324004_swaggerco.schemaParser</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>Parses API schema into endpoint and HTTP method records on the ServiceNow platform. Takes JSON schema as input.</description>
+        <name>schemaParser</name>
+        <script><![CDATA[var schemaParser = Class.create();
+schemaParser.prototype = {
+    initialize: function() {
+    },
+	
+	checkForKey: function(json, key){
+		var keys = Object.keys(json);
+		return keys.indexOf(key) != -1;
+	},
+	
+	getBasePath: function(json){
+		var jsonKeys = Object.keys(json);
+		if(jsonKeys.indexOf("basePath") != -1){
+			return json.basePath;
+		}
+		else if(jsonKeys.indexOf("servers") != -1){
+			for(var i = 0; i < json.servers.length; i++){
+				var tmpKeys = Object.keys(json.servers[i]);
+				if(tmpKeys.indexOf("url") != -1){
+					return json.servers.url;
+				}
+			}
+		}
+		else{
+			return "No base path found. Please manually review JSON and supply base path.";
+		}
+	},
+	
+	parseEndpointsAndMethods: function(json){
+		var endpoints = [];
+		var endpointList = Object.keys(json);
+		var methods = [
+			"get",
+			"head",
+			"post",
+			"patch",
+			"put",
+			"delete",
+			"connect",
+			"options",
+			"trace"
+		];
+		for(var endpoint in endpointList){
+			var endpointPropsList = Object.keys(json[endpointList[endpoint]]);
+			var methodsList = [];
+			for(var prop in endpointPropsList){
+				if(methods.indexOf(endpointPropsList[prop]) != -1){
+					var methodPropList = Object.keys(json[endpointList[endpoint]][endpointPropsList[prop]]);
+					var params = "";
+					var res = "";
+					if(methodPropList.indexOf("parameters") != -1){
+						params = json[endpointList[endpoint]][endpointPropsList[prop]].parameters;
+					}
+					if(methodPropList.indexOf("responses") != -1){
+						res = json[endpointList[endpoint]][endpointPropsList[prop]].responses;
+					}
+					methodsList.push({
+						"method": endpointPropsList[prop],
+						"parameters": params,
+						"responses": res
+					}); 
+				}
+			}
+			endpoints.push({
+				"endpoint": endpointList[endpoint],
+				"methods": methodsList
+			});
+			methodsList = [];
+		}
+		return endpoints;
+	},
+    type: 'schemaParser'
+};]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>aalberty@itsdelivers.com</sys_created_by>
+        <sys_created_on>2021-02-22 18:45:24</sys_created_on>
+        <sys_id>772684302fe22010125ad5ccf699b6ec</sys_id>
+        <sys_mod_count>7</sys_mod_count>
+        <sys_name>schemaParser</sys_name>
+        <sys_package display_value="SwaggerConverter" source="x_324004_swaggerco">df09f3672f122010125ad5ccf699b6de</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="SwaggerConverter">df09f3672f122010125ad5ccf699b6de</sys_scope>
+        <sys_update_name>sys_script_include_772684302fe22010125ad5ccf699b6ec</sys_update_name>
+        <sys_updated_by>aalberty@itsdelivers.com</sys_updated_by>
+        <sys_updated_on>2021-02-22 20:43:25</sys_updated_on>
+    </sys_script_include>
+</record_update>
