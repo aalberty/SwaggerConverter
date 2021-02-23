@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[api.controller=function() {
+  /* widget controller */
+  var c = this;
+	c.clearTextArea = clearTextArea;
+	c.expandMethodsList = expandMethodsList;
+	c.next = next;
+	c.prev = prev;
+	c.stepCount = 0;
+	c.endpoints = [];
+	
+	function clearTextArea(){
+		c.jsonTextArea = "";
+	}
+	
+	function expandMethodsList(endpoint){
+		console.log(endpoint);
+		if(endpoint.expanded == false || endpoint.expanded == undefined){
+			endpoint.expanded = true;
+		} else if(endpoint.expanded == true){
+			endpoint.expanded = false;
+		}
+	}
+	
+	function next(){
+		
+		var json = JSON.parse(c.jsonTextArea)
+		parseJson(json);
+		c.stepCount = 1;
+	}
+	
+	function prev(){
+		c.stepCount = 0;
+	}
+	
+	function parseJson(json){
+		var input = {
+			"action": "parseJson",
+			"json"	: json
+		};
+		
+		c.server.get(input).then(function(res){
+			//console.log(res);
+			console.log("ENDPOINTS: ", res.data.endpoints);
+			c.endpoints = res.data.endpoints;
+		});
+	}
+};]]></client_script>
+        <controller_as>c</controller_as>
+        <css>.endpoint-picker-header{
+	min-height: 200px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid black;
+  max-width: 800px;
+}
+
+.swagger-converter-container{
+	margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-flow: column;
+  max-width: 800px;
+}
+
+#exampleFormControlTextarea1{
+	max-width: 800px;
+}
+
+.button-container{
+	display: flex;
+  flex-flow: row;
+  justify-content: flex-end;
+}
+
+.btn.btn-primary{
+	margin-top: 10px;
+  margin-left: 10px;
+  width: 100px;
+}
+
+.endpoint-repeater{
+	max-height: 500px;
+  overflow-y: auto;
+	overflow-x: hidden;
+  margin-top: 10px;
+}
+
+.endpoint-row{
+	padding-left: 5px;
+  display: flex;
+  flex-flow: column;
+  margin-bottom: 10px;
+}
+
+.endpoint-row:hover{
+	background-color: #F5F5F5;
+}
+
+.endpoint-includer{
+	margin-left: auto;
+  margin-right: 20px;
+}
+
+.fa.fa-plus-circle, .fa.fa-minus-circle{
+	margin-top: auto;
+  margin-bottom: auto;
+  margin-right: 20px;
+}
+
+.endpoint-toolbar{
+	display: flex;
+}
+
+.endpoint-search{
+	margin-right: 30px;
+}
+
+.check-all-controls{
+	margin-left: auto;
+  margin-right: 25px;
+  min-width: 110px;
+}
+
+.endpoint-info{
+	display: flex;
+  flex-flow: row;
+}
+
+.endpoint-info-clickable{
+	display: flex;
+  flex-flow: row;
+}
+
+.method-row{
+	margin-left: 50px;
+}
+.methods-container{
+	display: flex;
+  flex-flow: column;
+}
+
+.fa.fa-circle{
+	font-size: 7px;
+  margin-top: auto;
+  margin-bottom: auto;
+  margin-right: 2px;
+}</css>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>false</has_preview>
+        <id>swaggerimporter</id>
+        <internal>false</internal>
+        <link><![CDATA[function link(scope, element, attrs, controller) {  }]]></link>
+        <name>SwaggerImporter</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[(function() {
+  /* populate the 'data' object */
+  /* e.g., data.table = $sp.getValue('table'); */
+	var schemaParser = new x_324004_swaggerco.schemaParser();
+	
+	if(input && input.action == "parseJson" && input.json){
+		if(input.json.paths != undefined){
+			var endpoints = schemaParser.parseEndpointsAndMethods(input.json.paths);
+			data.endpoints = endpoints;
+		}
+	}
+})();]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-02-23 16:08:01</sys_created_on>
+        <sys_id>2981f8452f222010125ad5ccf699b6ad</sys_id>
+        <sys_mod_count>131</sys_mod_count>
+        <sys_name>SwaggerImporter</sys_name>
+        <sys_package display_value="SwaggerConverter" source="x_324004_swaggerco">df09f3672f122010125ad5ccf699b6de</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="SwaggerConverter">df09f3672f122010125ad5ccf699b6de</sys_scope>
+        <sys_update_name>sp_widget_2981f8452f222010125ad5ccf699b6ad</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-02-23 21:57:20</sys_updated_on>
+        <template><![CDATA[<div class="swagger-converter-container">
+
+  
+  
+  <div class="json-drop-container" ng-show="c.stepCount == 0">
+    <label for="exampleFormControlTextarea1">JSON Schema: </label>
+    <textarea class="form-control rounded-0 z-depth-1" 
+              id="exampleFormControlTextarea1" 
+              rows="25"
+              spellcheck="false"
+              ng-model="c.jsonTextArea"></textarea>
+
+    <div class="button-container">
+      <button class="btn btn-primary"
+              ng-click="c.clearTextArea()">Clear</button>
+      <button class="btn btn-primary"
+              ng-click="c.next()">Next</button>
+    </div>
+  </div>
+
+  
+  
+  <div class="endpoint-picker-header">
+  	
+  </div>
+  
+  <div class="endpoint-picker-container" ng-show="c.stepCount == 1">
+    <label for="endpointRepeater">Choose which endpoints and methods you would like generated: </label>
+    <div class="endpoint-toolbar">
+      <input class="endpoint-search form-control" 
+             ng-model="query"
+             placeholder="Endpoint contains..."/>
+			
+      <div class="check-all-controls">
+        <input type="checkbox"
+             ng-model="checkUncheckAll"/>
+      	Affecting: {{filteredEndpoints.length}}
+      </div>
+    </div>
+    <div class="endpoint-repeater" id="endpointRepeater">
+      <div class="endpoint-row"
+           ng-repeat="endpoint in c.endpoints | filter: query as filteredEndpoints">
+        
+        <div class="endpoint-info">
+          <div class="endpoint-info-clickable"
+               ng-click="c.expandMethodsList(endpoint)">
+            <i class="fa" ng-class="{'fa-plus-circle': endpoint.expanded == false || endpoint.expanded == undefined,
+                                    'fa-minus-circle': endpoint.expanded == true}"></i>
+            {{endpoint.endpoint}} ({{endpoint.methods.length}})
+          </div>
+        	
+          <input class="endpoint-includer" type="checkbox" ng-model="endpoint.generateBool"/>
+        </div>
+        
+        
+      	<div class="methods-container"
+             ng-if="endpoint.expanded == true"
+             ng-repeat="method in endpoint.methods">
+          <div class="method-row">
+            <i class="fa fa-circle"/>
+            {{method.method}}<span ng-show="method.summary.length != 0"> - {{method.summary}}</span>
+          </div>
+        </div>
+      
+      </div>
+      
+      
+    </div>
+    <div class="button-container">
+      <button class="btn btn-primary"
+              ng-click="c.prev()">Back</button>
+      <button class="btn btn-primary">Generate</button>
+    </div>
+  </div>
+  
+ 
+
+</div>
+]]></template>
+    </sp_widget>
+</record_update>
