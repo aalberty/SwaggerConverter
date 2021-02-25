@@ -10,6 +10,7 @@
 	c.prev = prev;
 	c.stepCount = 0;
 	c.endpoints = [];
+	c.lockBaseUrlInput = true;
 	
 	function clearTextArea(){
 		c.jsonTextArea = "";
@@ -45,15 +46,43 @@
 			//console.log(res);
 			console.log("ENDPOINTS: ", res.data.endpoints);
 			c.endpoints = res.data.endpoints;
+			c.baseUrl = res.data.basePath;
 		});
 	}
 };]]></client_script>
         <controller_as>c</controller_as>
         <css>.endpoint-picker-header{
-	min-height: 200px;
+	min-height: 150px;
   margin-bottom: 20px;
   border-bottom: 1px solid black;
   max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-flow: row;
+}
+
+.url-container{
+	display: flex;
+  flex-flow: row;
+  align-items: center;
+  width: 50%;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.auth-profile-container{
+  display: flex;
+  align-items: center;
+	width: 50%;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.fa.fa-unlock, .fa.fa-lock{
+	margin-top: auto;
+  margin-bottom: auto;
+  margin-right: 10px;
 }
 
 .swagger-converter-container{
@@ -164,11 +193,21 @@
   /* populate the 'data' object */
   /* e.g., data.table = $sp.getValue('table'); */
 	var schemaParser = new x_324004_swaggerco.schemaParser();
-	
+	data.credsList = [];
+	var gr = new GlideRecord("discovery_credentials");
+	gr.query();
+	while(gr.next()){
+		data.credsList.push({
+			"sys_id": gr.getUniqueValue(),
+			"name": gr.getValue("name"),
+			"username": gr.getValue("user_name")
+		});
+	}
 	if(input && input.action == "parseJson" && input.json){
 		if(input.json.paths != undefined){
 			var endpoints = schemaParser.parseEndpointsAndMethods(input.json.paths);
 			data.endpoints = endpoints;
+			data.basePath  = schemaParser.getBasePath(input.json);
 		}
 	}
 })();]]></script>
@@ -177,15 +216,38 @@
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2021-02-23 16:08:01</sys_created_on>
         <sys_id>2981f8452f222010125ad5ccf699b6ad</sys_id>
-        <sys_mod_count>131</sys_mod_count>
+        <sys_mod_count>165</sys_mod_count>
         <sys_name>SwaggerImporter</sys_name>
         <sys_package display_value="SwaggerConverter" source="x_324004_swaggerco">df09f3672f122010125ad5ccf699b6de</sys_package>
         <sys_policy/>
         <sys_scope display_value="SwaggerConverter">df09f3672f122010125ad5ccf699b6de</sys_scope>
         <sys_update_name>sp_widget_2981f8452f222010125ad5ccf699b6ad</sys_update_name>
-        <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2021-02-23 21:57:20</sys_updated_on>
-        <template><![CDATA[<div class="swagger-converter-container">
+        <sys_updated_by>aalberty@itsdelivers.com</sys_updated_by>
+        <sys_updated_on>2021-02-24 22:27:31</sys_updated_on>
+        <template><![CDATA[<div class="endpoint-picker-header">
+  
+  <div class="url-container">
+    <i class="fa"
+       ng-class="{'fa-lock': c.lockBaseUrlInput == true, 'fa-unlock': c.lockBaseUrlInput == false}"
+       ng-click="c.lockBaseUrlInput=!c.lockBaseUrlInput"></i>
+  	<input class="base-url-input form-control" 
+         placeholder="Base URL"
+         ng-model="c.baseUrl"
+         ng-readonly="c.lockBaseUrlInput"/>	
+  </div>
+  
+  
+  <div class="auth-profile-container">
+  	<input class="form-control" 
+         type="text" 
+         ng-model="c.selectedAuthRecord" 
+         uib-typeahead="authRecord as authRecord.name for authRecord in c.data.credsList | limitTo:20"
+         placeholder="Choose an Authentication Profile"
+         typeahead-min-length="0"
+         typeahead-editable="false"/>
+  </div>
+</div>
+<div class="swagger-converter-container">
 
   
   
@@ -207,9 +269,7 @@
 
   
   
-  <div class="endpoint-picker-header">
-  	
-  </div>
+
   
   <div class="endpoint-picker-container" ng-show="c.stepCount == 1">
     <label for="endpointRepeater">Choose which endpoints and methods you would like generated: </label>
