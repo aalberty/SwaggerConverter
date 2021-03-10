@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="DELETE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_324004_swaggerco.restMessageGenerator</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>DEPRECATED: Generate REST Message endpoint and method records.</description>
+        <name>restMessageGenerator</name>
+        <script><![CDATA[var restMessageGenerator = Class.create();
+restMessageGenerator.prototype = {
+    initialize: function(baseUrl, authType) {
+		if(baseUrl != undefined){
+			this.baseUrl = baseUrl;
+		} else {
+			this.baseUrl = "";
+		}
+		if(authType != undefined){
+			/*
+			Accepts no_authentication, basic, basic_simple, oauth2
+			*/
+			this.authType = authType;
+		} else {
+			this.authType = "no_authentication";
+		}
+	},
+
+	generateEndpointsAndMethods: function(endpointsList){
+		for(var i = 0; i < endpointsList.length; i++){
+			this.generateEndpoint(endpointsList[i]);
+		}
+	},
+	
+	generateEndpoint: function(endpoint){
+		var rmGr = new GlideRecord("sys_rest_message");
+		rmGr.initialize();
+		var endpointStr = this._addVariableSyntax(endpoint.endpoint);
+		rmGr.name = endpoint.endpoint;
+		rmGr.rest_endpoint = this.baseUrl + endpoint.endpoint;
+		rmGr.access = "package_private";
+		if(this.authType){
+			rmGr.authentication_type = this.authType;
+		}
+		var restMessageRecordId = rmGr.insert();
+		if(endpoint.methods && endpoint.methods.length){
+			for(var i = 0; i < endpoint.methods.length; i++){
+				this.generateMethod(endpoint.methods[i], restMessageRecordId);
+			}
+		}
+	},
+	
+	generateMethod: function(method, parentEndpointId){
+		var methodGr = new GlideRecord("sys_rest_message_fn");
+		methodGr.initialize();
+		methodGr.function_name = method.summary;
+		methodGr.http_method = method.method;
+		methodGr.authentication_type = "inherit_from_parent";
+		methodGr.rest_message = parentEndpointId;
+		methodGr.insert();
+	},
+	
+	_addVariableSyntax: function(endpoint){
+		while(endpoint.indexOf("{") != -1){
+			var index = endpoint.indexOf("{");
+			endpoint = endpoint.substr(0, index) + "$" + endpoint.substr(index);
+		}
+		return endpoint;
+	},
+	
+    type: 'restMessageGenerator'
+};]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>aalberty@itsdelivers.com</sys_created_by>
+        <sys_created_on>2021-03-05 01:51:57</sys_created_on>
+        <sys_id>205c89c42f322010125ad5ccf699b60e</sys_id>
+        <sys_mod_count>14</sys_mod_count>
+        <sys_name>restMessageGenerator</sys_name>
+        <sys_package display_value="SwaggerConverter" source="x_324004_swaggerco">df09f3672f122010125ad5ccf699b6de</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="SwaggerConverter">df09f3672f122010125ad5ccf699b6de</sys_scope>
+        <sys_update_name>sys_script_include_205c89c42f322010125ad5ccf699b60e</sys_update_name>
+        <sys_updated_by>aalberty@itsdelivers.com</sys_updated_by>
+        <sys_updated_on>2021-03-07 18:48:10</sys_updated_on>
+    </sys_script_include>
+    <sys_update_version action="INSERT_OR_UPDATE">
+        <action>DELETE</action>
+        <application display_value="SwaggerConverter">df09f3672f122010125ad5ccf699b6de</application>
+        <file_path/>
+        <instance_id>dded4f7bdbbfdb04536ad5b0cf9619d0</instance_id>
+        <instance_name>dev70604</instance_name>
+        <name>sys_script_include_205c89c42f322010125ad5ccf699b60e</name>
+        <payload>&lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;record_update table="sys_script_include"&gt;&lt;sys_script_include action="INSERT_OR_UPDATE"&gt;&lt;access&gt;public&lt;/access&gt;&lt;active&gt;true&lt;/active&gt;&lt;api_name&gt;x_324004_swaggerco.restMessageGenerator&lt;/api_name&gt;&lt;caller_access/&gt;&lt;client_callable&gt;false&lt;/client_callable&gt;&lt;description&gt;DEPRECATED: Generate REST Message endpoint and method records.&lt;/description&gt;&lt;name&gt;restMessageGenerator&lt;/name&gt;&lt;script&gt;&lt;![CDATA[var restMessageGenerator = Class.create();
+restMessageGenerator.prototype = {
+    initialize: function(baseUrl, authType) {
+		if(baseUrl != undefined){
+			this.baseUrl = baseUrl;
+		} else {
+			this.baseUrl = "";
+		}
+		if(authType != undefined){
+			/*
+			Accepts no_authentication, basic, basic_simple, oauth2
+			*/
+			this.authType = authType;
+		} else {
+			this.authType = "no_authentication";
+		}
+	},
+
+	generateEndpointsAndMethods: function(endpointsList){
+		for(var i = 0; i &lt; endpointsList.length; i++){
+			this.generateEndpoint(endpointsList[i]);
+		}
+	},
+	
+	generateEndpoint: function(endpoint){
+		var rmGr = new GlideRecord("sys_rest_message");
+		rmGr.initialize();
+		var endpointStr = this._addVariableSyntax(endpoint.endpoint);
+		rmGr.name = endpoint.endpoint;
+		rmGr.rest_endpoint = this.baseUrl + endpoint.endpoint;
+		rmGr.access = "package_private";
+		if(this.authType){
+			rmGr.authentication_type = this.authType;
+		}
+		var restMessageRecordId = rmGr.insert();
+		if(endpoint.methods &amp;&amp; endpoint.methods.length){
+			for(var i = 0; i &lt; endpoint.methods.length; i++){
+				this.generateMethod(endpoint.methods[i], restMessageRecordId);
+			}
+		}
+	},
+	
+	generateMethod: function(method, parentEndpointId){
+		var methodGr = new GlideRecord("sys_rest_message_fn");
+		methodGr.initialize();
+		methodGr.function_name = method.summary;
+		methodGr.http_method = method.method;
+		methodGr.authentication_type = "inherit_from_parent";
+		methodGr.rest_message = parentEndpointId;
+		methodGr.insert();
+	},
+	
+	_addVariableSyntax: function(endpoint){
+		while(endpoint.indexOf("{") != -1){
+			var index = endpoint.indexOf("{");
+			endpoint = endpoint.substr(0, index) + "$" + endpoint.substr(index);
+		}
+		return endpoint;
+	},
+	
+    type: 'restMessageGenerator'
+};]]&gt;&lt;/script&gt;&lt;sys_class_name&gt;sys_script_include&lt;/sys_class_name&gt;&lt;sys_created_by&gt;aalberty@itsdelivers.com&lt;/sys_created_by&gt;&lt;sys_created_on&gt;2021-03-05 01:51:57&lt;/sys_created_on&gt;&lt;sys_id&gt;205c89c42f322010125ad5ccf699b60e&lt;/sys_id&gt;&lt;sys_mod_count&gt;14&lt;/sys_mod_count&gt;&lt;sys_name&gt;restMessageGenerator&lt;/sys_name&gt;&lt;sys_package display_value="SwaggerConverter" source="x_324004_swaggerco"&gt;df09f3672f122010125ad5ccf699b6de&lt;/sys_package&gt;&lt;sys_policy&gt;read&lt;/sys_policy&gt;&lt;sys_scope display_value="SwaggerConverter"&gt;df09f3672f122010125ad5ccf699b6de&lt;/sys_scope&gt;&lt;sys_update_name&gt;sys_script_include_205c89c42f322010125ad5ccf699b60e&lt;/sys_update_name&gt;&lt;sys_updated_by&gt;aalberty@itsdelivers.com&lt;/sys_updated_by&gt;&lt;sys_updated_on&gt;2021-03-07 18:48:10&lt;/sys_updated_on&gt;&lt;/sys_script_include&gt;&lt;/record_update&gt;</payload>
+        <payload_hash>-712916538</payload_hash>
+        <record_name>restMessageGenerator</record_name>
+        <reverted_from/>
+        <source>c5064c742fa22010125ad5ccf699b6e3</source>
+        <source_table>sys_update_set</source_table>
+        <state>previous</state>
+        <sys_created_by>aalberty@itsdelivers.com</sys_created_by>
+        <sys_created_on>2021-03-07 18:48:10</sys_created_on>
+        <sys_id>98494bfc2ffe2010125ad5ccf699b659</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_recorded_at>1780e04ac7f0000001</sys_recorded_at>
+        <sys_updated_by>aalberty@itsdelivers.com</sys_updated_by>
+        <sys_updated_on>2021-03-07 18:48:10</sys_updated_on>
+        <type>Script Include</type>
+        <update_guid>90494bfc35fe20108feafe80e4339559</update_guid>
+        <update_guid_history>90494bfc35fe20108feafe80e4339559:-712916538,f436c7bc5cfe2010a58cd56319d37617:1138450541,50a04f247ef22010e17bd83fb6a9670c:-572333526,696c36604df2201010d181dcddfa6bc9:2032185755,c62cf26081f220106999e23e46daff76:59686323,1bfbb22011f22010d89b7e186265f7a9:-1779191762,975b7eec8eb2201035b09a1d6b25983d:-927712296,f35a7aac11b220105824e2423c27ae2e:1041011811,2f2a76ec6db22010d88f227d39c8fbfd:-681369582,1a2af6ecc5b22010c9a9d07003a789b6:-1283047174,15397aac97b220100387ef1250d9ba1c:1776767547,8a0c42e8183220103aa90a4f93bd22b6:1348973583,e8fa42e829322010415e079528a8889f:30852521,73a9ce683c3220108f2b092a7bc45c11:117683599,b67d81081132201020a59351da7e6908:-636127598</update_guid_history>
+    </sys_update_version>
+    <sys_metadata_delete action="INSERT_OR_UPDATE">
+        <sys_audit_delete/>
+        <sys_class_name>sys_metadata_delete</sys_class_name>
+        <sys_created_by>aalberty@itsdelivers.com</sys_created_by>
+        <sys_created_on>2021-03-07 20:52:23</sys_created_on>
+        <sys_db_object display_value="" name="sys_script_include">sys_script_include</sys_db_object>
+        <sys_id>6da0d575e1984164a893bb423e169a90</sys_id>
+        <sys_metadata>205c89c42f322010125ad5ccf699b60e</sys_metadata>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>restMessageGenerator</sys_name>
+        <sys_package display_value="SwaggerConverter" source="x_324004_swaggerco">df09f3672f122010125ad5ccf699b6de</sys_package>
+        <sys_parent/>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="SwaggerConverter">df09f3672f122010125ad5ccf699b6de</sys_scope>
+        <sys_scope_delete display_value="">15ae3ef121344c12baf39a737e5da209</sys_scope_delete>
+        <sys_update_name>sys_script_include_205c89c42f322010125ad5ccf699b60e</sys_update_name>
+        <sys_update_version display_value="sys_script_include_205c89c42f322010125ad5ccf699b60e">98494bfc2ffe2010125ad5ccf699b659</sys_update_version>
+        <sys_updated_by>aalberty@itsdelivers.com</sys_updated_by>
+        <sys_updated_on>2021-03-07 20:52:23</sys_updated_on>
+    </sys_metadata_delete>
+</record_update>
